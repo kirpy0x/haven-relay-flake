@@ -72,10 +72,12 @@ let
     # Import Settings
     IMPORT_START_DATE=${instanceCfg.importStartDate}
     IMPORT_QUERY_INTERVAL_SECONDS=${toString instanceCfg.importQueryIntervalSeconds}
-    IMPORT_SEED_RELAYS_FILE="relays_import.json"
+    # IMPORT_SEED_RELAYS_FILE="relays_import.json"
+    IMPORT_SEED_RELAYS_FILE = "${pkgs.writeText "relays_import.json" ( builtins.toJSON instanceCfg.importRelays )}";
 
     # Blastr Settings
-    BLASTR_RELAYS_FILE="relays_blastr.json"
+    # BLASTR_RELAYS_FILE="relays_blastr.json"
+    BLASTR_RELAYS_FILE = "${pkgs.writeText "relays_blastr.json" (builtins.toJSON instanceCfg.blastrRelays)}";
 
     # Backup Settings
     BACKUP_PROVIDER=${instanceCfg.backup.provider}
