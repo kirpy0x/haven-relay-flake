@@ -4,8 +4,7 @@ let
   cfg = config.services.haven-relay;
 
   # Import the .env file generation logic
-  inherit (import ./haven-env.nix { inherit config lib pkgs; }) mkEnvFile;
-
+  inherit (import ./haven-env.nix { inherit pkgs; }) mkEnvFile;
   # Build the Haven Relay package (example; adjust as needed)
   havenPackage = pkgs.buildGoModule {
     pname = "haven-relay";

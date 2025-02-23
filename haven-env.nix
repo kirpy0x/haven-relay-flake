@@ -1,9 +1,6 @@
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 
 let
-  cfg = config.services.haven-relay;
-
-  # Function to generate .env file for each instance
   mkEnvFile = name: instanceCfg: pkgs.writeText "haven-relay-${name}-env" ''
     OWNER_NPUB=${instanceCfg.ownerNpub}
     RELAY_URL=${instanceCfg.relayUrl}
@@ -93,37 +90,6 @@ let
       '' else ""}
     '' else ""}
   '';
-
-  # Generate relay JSON files
-  mkRelayJson = relays: pkgs.writeText "relays.json" (builtins.toJSON relays);
-in
-{
-  config = lib.mkIf (cfg != {}) {
-    systemd.services = lib.mapAttrs' (name: instanceCfg: {
-      name = "haven-relay-${name}";
-      value = {
-        enable = instanceCfg.enable;
-        description = "Haven Relay service for ${name}";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" ];
-        serviceConfig = {
-          ExecStartPre = [
-            "${pkgs.coreutils}/bin/ln -sf ${mkEnvFile name instanceCfg} /var/lib/haven-relay-${name}/.env"
-            "${pkgs.coreutils}/bin/ln -sf ${mkRelayJson instanceCfg.importRelays} /var/lib/haven-relay-${name}/relays_import.json"
-            "${pkgs.coreutils}/bin/ln -sf ${mkRelayJson instanceCfg.blastrRelays} /var/lib/haven-relay-${name}/relays_blastr.json"
-          ];
-          ExecStart = "${pkgs.haven-relay}/bin/haven-relay --config /var/lib/haven-relay-${name}/.env";
-          DynamicUser = true;
-          StateDirectory = "haven-relay-${name}";
-          WorkingDirectory = "/var/lib/haven-relay-${name}";
-          Restart = "always";
-        };
-      };
-    }) cfg;
-
-    # Open firewall ports for each enabled instance
-    networking.firewall.allowedTCPPorts = lib.concatMap
-      (name: instanceCfg: lib.optionals instanceCfg.enable [ instanceCfg.relayPort ])
-      (lib.attrValues cfg);
-  };
+in {
+  inherit mkEnvFile;
 }

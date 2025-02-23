@@ -6,6 +6,8 @@
 
   # Define the outputs (what your flake provides)
   outputs = { self, nixpkgs }: {
-    nixosModules.haven-relay = import ./haven-relay.nix;
+    nixosModules.haven-relay = import ./haven-relay.nix {
+      inherit (nixpkgs) lib pkgs;
+    };
   };
 }
