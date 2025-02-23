@@ -44,14 +44,16 @@
 
         importRelays = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          default = [];
+          default = [ "wss://relay.damus.io" ];
           description = "List of import relays.";
+          example = [ "wss://relay.damus.io" ];
         };
 
         blastrRelays = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          default = [];
+          default = [ "wss://relay.damus.io" ];
           description = "List of blastr relays.";
+          example = [ "wss://relay.damus.io" ];
         };
 
         relayIcon = lib.mkOption {
@@ -302,9 +304,15 @@
               enable = lib.mkEnableOption "Backup service for Haven Relay";
 
               provider = lib.mkOption {
-                type = lib.types.enum [ "none" "s3" ];
-                default = "none";
-                description = "Backup provider.";
+                type = lib.types.either
+                  (lib.types.enum [ "none" "s3" ])  # When enabled
+                  (lib.types.strMatching "") 
+                ;
+                default = "";
+                description = ''
+                  Backup provider. When backup.enable is true, must be "none" or "s3".
+                  When backup.enable is false, defaults to "" and other values are ignored.
+                '';
               };
 
               intervalHours = lib.mkOption {

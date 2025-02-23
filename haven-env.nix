@@ -78,8 +78,8 @@ let
     BLASTR_RELAYS_FILE="relays_blastr.json"
 
     # Backup Settings
+    BACKUP_PROVIDER=${instanceCfg.backup.provider}
     ${if instanceCfg.backup.enable then ''
-      BACKUP_PROVIDER=${instanceCfg.backup.provider}
       BACKUP_INTERVAL_HOURS=${toString instanceCfg.backup.intervalHours}
       ${if instanceCfg.backup.provider == "s3" then ''
         S3_ACCESS_KEY_ID=${instanceCfg.backup.s3.accessKeyId}
